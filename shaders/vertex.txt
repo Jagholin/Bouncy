@@ -1,0 +1,21 @@
+#version 420
+
+layout(location=0) in vec4 in_position;
+layout(location=1) in vec3 in_normal;
+layout(location=2) in vec3 in_color;
+
+out vec4 int_position;
+out vec3 int_normal;
+out vec3 int_color;
+
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 modelMatrix;
+
+void main(){
+	int_position = projectionMatrix * viewMatrix * modelMatrix * in_position;
+	//int_position = in_position;
+	int_normal = (projectionMatrix * viewMatrix * modelMatrix * vec4(in_normal, 0.0)).xyz;
+	int_color = in_color;
+	gl_Position = int_position;
+}
