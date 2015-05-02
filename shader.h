@@ -1,6 +1,7 @@
 #pragma once
 #include <GL/glew.h>
 #include <string>
+#include <unordered_map>
 
 class ShaderProgram
 {
@@ -20,4 +21,6 @@ protected:
 	GLuint m_vShader, m_fShader, m_program;
 	bool m_linked;
 	static GLuint s_boundProgram;
+
+	std::unordered_map<std::string, GLint> m_uniformLocs;
 };

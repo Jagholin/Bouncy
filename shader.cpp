@@ -125,9 +125,13 @@ bool ShaderProgram::loadFromFile(std::string const& vertexShader, std::string co
 
 GLint ShaderProgram::uniformLocation(const std::string& name)
 {
+	auto maploc = m_uniformLocs.find(name);
+	if (maploc != m_uniformLocs.cend())
+		return maploc->second;
 	check_gl_error();
 	GLint loc = glGetUniformLocation(m_program, name.c_str());
 	check_gl_error();
+	m_uniformLocs.insert(maploc, std::make_pair(name, loc));
 	return loc;
 }
 

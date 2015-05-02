@@ -4,7 +4,7 @@
 #include <memory>
 #include <glm/fwd.hpp>
 
-class StateData;
+class RegistryDataItem;
 class ShaderProgram;
 class Uniform
 {
@@ -15,8 +15,8 @@ public:
 	virtual void apply(ShaderProgram*) = 0;
 	bool overrides(const Uniform& otherUniform);
 
-	virtual bool checkData(std::shared_ptr<StateData> const &data) = 0;
-	virtual std::shared_ptr<StateData> createStateData() = 0;
+	virtual bool checkData(std::shared_ptr<RegistryDataItem> const &data) = 0;
+	virtual std::shared_ptr<RegistryDataItem> createStateData() = 0;
 
 	std::string name() const;
 
@@ -48,7 +48,7 @@ public:
 		apply_impl(prog, m_value);
 	}
 
-	virtual bool checkData(std::shared_ptr<StateData> const &data) override
+	virtual bool checkData(std::shared_ptr<RegistryDataItem> const &data) override
 	{
 		if (!data->isA<UniformStateData<GlmT>>())
 			return false;
@@ -56,7 +56,7 @@ public:
 		return rvalue == m_value;
 	}
 
-	virtual std::shared_ptr<StateData> createStateData() override
+	virtual std::shared_ptr<RegistryDataItem> createStateData() override
 	{
 		return std::make_shared<UniformStateData<GlmT>>(m_value);
 	}

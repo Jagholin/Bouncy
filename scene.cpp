@@ -96,7 +96,7 @@ void GraphicsScene::init()
 	m_uniformsData = m_state->stateData("globalUniforms");
 	if (!m_uniformsData)
 	{
-		m_state->setStateData("globalUniforms", std::make_shared<StateData>());
+		m_state->setStateData("globalUniforms", std::make_shared<RegistryDataItem>());
 		m_uniformsData = m_state->stateData("globalUniforms");
 	}
 

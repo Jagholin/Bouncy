@@ -46,9 +46,9 @@ class GraphicsState
 {
 public:
 
-	StateData* stateData(const std::string& name) const;
+	RegistryDataItem* stateData(const std::string& name) const;
 
-	void setStateData(std::string name, std::shared_ptr<StateData> stateData);
+	void setStateData(std::string name, std::shared_ptr<RegistryDataItem> stateData);
 	void commit();
 
 	friend class ApplyStateSet;
@@ -58,7 +58,7 @@ protected:
 	GraphicsStateSet m_currentState;
 
 	// Current graphics state
-	std::unordered_map<std::string, std::shared_ptr<StateData>> m_stateData;
+	std::unordered_map<std::string, std::shared_ptr<RegistryDataItem>> m_stateData;
 };
 
 class ApplyStateSet

@@ -7,7 +7,7 @@ class ShaderProgram;
 
 class SceneNode;
 class GraphicsState;
-class StateData;
+class RegistryDataItem;
 class Camera;
 class Drawable;
 class CameraNode;
@@ -40,6 +40,6 @@ protected:
 	GraphicsState* m_state;
 
 	// GraphicsState registry entry on global uniforms
-	StateData* m_uniformsData;
+	RegistryDataItem* m_uniformsData;
 	Camera* m_camera;
 };

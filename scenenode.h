@@ -40,16 +40,20 @@ public:
 	SceneNode* parent() const;
 
 	glm::mat4 worldTransform() const;
+	void rebuildStateSet();
 
 	std::string name();
 protected:
 	glm::mat4 m_nodeTransform;
 	std::shared_ptr<GraphicsStateSet> m_nodeState;
+	std::unique_ptr<GraphicsStateSet> m_compiledStateSet;
+
 	std::deque<std::shared_ptr<Drawable>> m_drawables;
 	std::deque<std::shared_ptr<SceneNode>> m_children;
 	SceneNode* m_parent;
 	std::string m_name;
 	GraphicsScene* m_scene;
+	bool m_stateSetValid = false;
 
 	void orphan();
 	void resetParent(SceneNode* newParent);

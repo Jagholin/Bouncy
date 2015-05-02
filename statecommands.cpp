@@ -75,7 +75,7 @@ m_program(newProgram)
 
 void ProgramChangeCommand::apply(GraphicsState& theState)
 {
-	StateData* myData = theState.stateData("shaderProgram");
+	RegistryDataItem* myData = theState.stateData("shaderProgram");
 	if (!myData || !myData->isA<ProgramStateData>())
 	{
 		if (myData)
@@ -111,7 +111,7 @@ void ProgramChangeCommand::addToQueue(const GraphicsState& theState, CommandQueu
 
 	// Add all global uniforms to the queue as well
 	// test text oinput
-	StateData* uniformData = theState.stateData("globalUniforms");
+	RegistryDataItem* uniformData = theState.stateData("globalUniforms");
 	for (auto anUniform : uniformData->childData)
 	{
 		if (!anUniform.second->isUniformData())
@@ -134,7 +134,7 @@ m_uniform(newUniform)
 
 void UniformChangeCommand::apply(GraphicsState& theState)
 {
-	StateData* programData = theState.stateData("shaderProgram");
+	RegistryDataItem* programData = theState.stateData("shaderProgram");
 	if (!programData || !programData->isA<ProgramStateData>())
 	{
 		std::cerr << "Cannot retrieve current shader program from GraphicsState, line " << __LINE__ << " file " << __FILE__ << std::endl;
@@ -210,7 +210,7 @@ CommandQueue::AddToQueueOp UniformChangeCommand::canAddToQueue(CommandQueue::que
 
 void UniformChangeCommand::waitingSweep(GraphicsState const& theState) const
 {
-	StateData* currProgram = theState.stateData("shaderProgram");
+	RegistryDataItem* currProgram = theState.stateData("shaderProgram");
 	if (!currProgram || !currProgram->isA<ProgramStateData>())
 	{
 		std::cerr << "Applying uniform with no program chosen\n";

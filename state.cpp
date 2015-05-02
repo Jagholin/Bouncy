@@ -89,7 +89,7 @@ GraphicsStateSet& GraphicsStateSet::operator=(GraphicsStateSet&& rhs)
 	return *this;
 }
 
-StateData* GraphicsState::stateData(const std::string& name) const
+RegistryDataItem* GraphicsState::stateData(const std::string& name) const
 {
 	if (m_stateData.count(name) > 0)
 	{
@@ -98,7 +98,7 @@ StateData* GraphicsState::stateData(const std::string& name) const
 	return nullptr;
 }
 
-void GraphicsState::setStateData(std::string name, std::shared_ptr<StateData> stateData)
+void GraphicsState::setStateData(std::string name, std::shared_ptr<RegistryDataItem> stateData)
 {
 	m_stateData[name] = stateData;
 }
