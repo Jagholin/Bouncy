@@ -137,6 +137,10 @@ public:
 		myItem->m_children.insert_or_assign(name, newItem);
 	}
 
+	void removeItem(itemptr_type const& iptr) {
+		
+	}
+
 protected:
 	itemptr_type m_rootItem;
 };
