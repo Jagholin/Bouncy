@@ -89,18 +89,9 @@ GraphicsStateSet& GraphicsStateSet::operator=(GraphicsStateSet&& rhs)
 	return *this;
 }
 
-RegistryDataItem* GraphicsState::stateData(const std::string& name) const
+GraphicsStateRegistry & GraphicsState::stateData()
 {
-	if (m_stateData.count(name) > 0)
-	{
-		return m_stateData.at(name).get();
-	}
-	return nullptr;
-}
-
-void GraphicsState::setStateData(std::string name, std::shared_ptr<RegistryDataItem> stateData)
-{
-	m_stateData[name] = stateData;
+	return m_stateData;
 }
 
 void GraphicsState::commit()

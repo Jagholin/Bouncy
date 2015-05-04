@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <map>
 #include <memory>
-#include "statedata.h"
+#include "registry.h"
 #include "stateelements.h"
 
 class CommandQueue;
@@ -42,13 +42,16 @@ protected:
 	std::map<std::string, std::shared_ptr<GraphicsStateElement>> m_stateElements;
 };
 
+typedef Registry<std::shared_ptr<ShaderProgram>, std::shared_ptr<Uniform>> GraphicsStateRegistry;
+typedef GraphicsStateRegistry::itemptr_type GraphicsStateRegistryItemPtr;
+
 class GraphicsState
 {
 public:
+	//GraphicsStateRegistryItemPtr stateData(const std::string& name) const;
 
-	RegistryDataItem* stateData(const std::string& name) const;
-
-	void setStateData(std::string name, std::shared_ptr<RegistryDataItem> stateData);
+	//void setStateData(std::string name, std::shared_ptr<RegistryDataItem> stateData);
+	GraphicsStateRegistry& stateData();
 	void commit();
 
 	friend class ApplyStateSet;
@@ -58,7 +61,8 @@ protected:
 	GraphicsStateSet m_currentState;
 
 	// Current graphics state
-	std::unordered_map<std::string, std::shared_ptr<RegistryDataItem>> m_stateData;
+	//std::unordered_map<std::string, std::shared_ptr<RegistryDataItem>> m_stateData;
+	GraphicsStateRegistry m_stateData;
 };
 
 class ApplyStateSet

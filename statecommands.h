@@ -2,7 +2,8 @@
 
 #include <deque>
 #include <memory>
-#include "statedata.h"
+
+#include "state.h"
 
 class StateChangeCommand;
 class GraphicsState;
@@ -55,9 +56,11 @@ public:
 
 	CommandType type() const override;
 
-	typedef TypedStateData<std::shared_ptr<ShaderProgram>> ProgramStateData;
+	//typedef TypedStateData<std::shared_ptr<ShaderProgram>> ProgramStateData;
 protected:
 	std::shared_ptr<ShaderProgram> m_program;
+	std::unique_ptr<LifetimeObserver> m_dataitemSentry;
+	GraphicsStateRegistryItemPtr m_currentShaderItem;
 };
 
 class Uniform;
@@ -74,7 +77,7 @@ public:
 	virtual CommandQueue::AddToQueueOp canAddToQueue(CommandQueue::queue_type& aQueue, CommandQueue::iterator_type const& newElemBegin, CommandQueue::iterator_type const& newElemEnd) override;
 	virtual void waitingSweep(GraphicsState const&) const override;
 
-	typedef TypedStateData<std::shared_ptr<ShaderProgram>> ProgramStateData;
+	//typedef TypedStateData<std::shared_ptr<ShaderProgram>> ProgramStateData;
 protected:
 	std::shared_ptr<Uniform>  m_uniform;
 };

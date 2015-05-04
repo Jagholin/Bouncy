@@ -6,25 +6,50 @@
 #include <memory>
 #include "uniform.h"
 #include "any_of.h"
+#include "lifetimeobserver.h"
+
+template <typename T>
+struct deleter_policy
+{
+	static void dealloc(T&) {
+		throw std::invalid_argument("T is not a pointer type");
+	}
+};
+
+template <typename T> 
+struct deleter_policy<T*>
+{
+	static void dealloc(T* ptr) {
+		delete ptr;
+	}
+};
+
+template <typename T>
+struct deleter_policy<std::shared_ptr<T>>
+{
+	static void dealloc(std::shared_ptr<T>) {
+		// do nothin'.
+	}
+};
 
 template <typename RegistryType>
-class RegistryDataItem
+class RegistryDataItem : public LifetimeObservable
 {
 public:
 	RegistryDataItem(const RegistryDataItem&) = delete;
 	RegistryDataItem(RegistryDataItem&&) = delete;
 
-	typedef std::shared_ptr<RegistryDataItem<RegistryType>> pointer;
+	typedef RegistryDataItem<RegistryType>* pointer;
 	typedef RegistryType::container_type value_type;
 
-	virtual bool isUniformData() const{
-		return false;
-	}
+	//virtual bool isUniformData() const{
+	//	return false;
+	//}
 
-	virtual std::shared_ptr<Uniform> asUniform(std::string const&)
-	{
-		return std::shared_ptr < Uniform > {nullptr};
-	}
+	//virtual std::shared_ptr<Uniform> asUniform(std::string const&)
+	//{
+	//	return std::shared_ptr < Uniform > {nullptr};
+	//}
 
 	auto begin() -> decltype(m_children.begin()){
 		return m_children.begin();
@@ -55,16 +80,29 @@ public:
 		return as<T>(m_value);
 	}
 
+	template <typename T>
+	bool isValueOf() const {
+		return m_value.isA<T>();
+	}
+
+	template <typename T>
+	void setValue(T const& val) {
+		m_value = value_type{ val };
+	}
+
 	friend class RegistryType;
 protected:
-	RegistryDataItem() = default;
+	RegistryDataItem(RegistryType& owner, pointer parent, std::string const& name, value_type const& val):
+	m_owner(owner), m_parent(parent), m_name(name), m_value(val){
+
+	}
 
 	RegistryType& m_owner;
 	std::unordered_map<std::string, pointer> m_children;
+	pointer m_parent;
+	std::string m_name;
 	value_type m_value;
 };
-
-
 
 //typedef RegistryDataItem::pointer RegistryDataPointer;
 
@@ -76,7 +114,7 @@ public:
 	typedef any_of<Types...> container_type;
 	typedef item_type::pointer itemptr_type;
 
-	Registry():m_rootItem{ new item_type } {
+	Registry() :m_rootItem{ new item_type(*this, nullptr, "root", container_type{}) } {
 		
 	}
 
@@ -130,15 +168,22 @@ public:
 		if (!myItem)
 			throw std::out_of_range("There is no items at "s + addr);
 
-		itemptr_type newItem{ new item_type };
-		newItem->m_owner = *this;
-		newItem->m_value = container_type(itemData);
-
-		myItem->m_children.insert_or_assign(name, newItem);
+		if ((auto oldItem = myItem->m_children.find(name)) == myItem->m_children.end()) {
+			itemptr_type newItem{ new item_type(*this, myItem, name, container_type{ value } ) };
+			myItem->m_children.insert(name, newItem);
+		}
+		else {
+			oldItem->second->m_value = container_type{ value };
+		}
+			
 	}
 
 	void removeItem(itemptr_type const& iptr) {
-		
+		// remove item from parents children container
+		if (iptr->m_parent) {
+			iptr->m_parent->m_children.erase(iptr->m_name);
+			deleter_policy<itemptr_type>::dealloc(iptr);
+		}
 	}
 
 protected:

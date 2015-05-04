@@ -75,25 +75,34 @@ m_program(newProgram)
 
 void ProgramChangeCommand::apply(GraphicsState& theState)
 {
-	RegistryDataItem* myData = theState.stateData("shaderProgram");
-	if (!myData || !myData->isA<ProgramStateData>())
+	//RegistryDataItem* myData = theState.stateData("shaderProgram");
+	if (!m_currentShaderItem)
 	{
-		if (myData)
+		GraphicsStateRegistry& stateRegistry = theState.stateData();
+		m_currentShaderItem = stateRegistry.item_at("/shaderProgram");
+		if (!m_currentShaderItem || !m_currentShaderItem->isValueOf<std::shared_ptr<ShaderProgram>>())
 		{
-			// !myData->isA<GLObjectStateData>()
-			std::cerr << "myData is not a ProgramStateData, line " << __LINE__ << " file " << __FILE__ << std::endl;
+			if (m_currentShaderItem)
+			{
+				// !myData->isA<GLObjectStateData>()
+				std::cerr << "myData is not a shared_ptr<ShaderProgram>, line " << __LINE__ << " file " << __FILE__ << std::endl;
+			}
+			// No current program applied, apply this one
+			m_program->use();
+			//theState.setStateData("shaderProgram", std::make_shared<ProgramStateData>(m_program));
+			m_currentShaderItem = stateRegistry.createItemAt("/", "shaderProgram", m_program);
 		}
-		// No current program applied, apply this one
-		m_program->use();
-		theState.setStateData("shaderProgram", std::make_shared<ProgramStateData>(m_program));
-		return;
+		m_dataitemSentry.reset(new LifetimeObserver(m_currentShaderItem, [this]() {
+			m_currentShaderItem = nullptr;
+		}));
 	}
 
-	ProgramStateData* realData = static_cast<ProgramStateData*>(myData);
-	if (realData->data == m_program)
+	//ProgramStateData* realData = static_cast<ProgramStateData*>(myData);
+	auto realData = m_currentShaderItem->as<std::shared_ptr<ShaderProgram>>();
+	if (realData == m_program)
 		return;
 	m_program->use();
-	realData->data = m_program;
+	m_currentShaderItem->setValue(m_program);
 }
 
 void ProgramChangeCommand::addToQueue(const GraphicsState& theState, CommandQueue& commandQueue)
