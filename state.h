@@ -42,7 +42,7 @@ protected:
 	std::map<std::string, std::shared_ptr<GraphicsStateElement>> m_stateElements;
 };
 
-typedef Registry<std::shared_ptr<ShaderProgram>, std::shared_ptr<Uniform>> GraphicsStateRegistry;
+typedef Registry<std::shared_ptr<ShaderProgram>, std::shared_ptr<Uniform>, std::shared_ptr<GlmUniform<glm::mat4>>> GraphicsStateRegistry;
 typedef GraphicsStateRegistry::itemptr_type GraphicsStateRegistryItemPtr;
 
 class GraphicsState
@@ -52,6 +52,7 @@ public:
 
 	//void setStateData(std::string name, std::shared_ptr<RegistryDataItem> stateData);
 	GraphicsStateRegistry& stateData();
+	const GraphicsStateRegistry& stateData() const;
 	void commit();
 
 	friend class ApplyStateSet;

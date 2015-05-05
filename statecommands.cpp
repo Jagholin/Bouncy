@@ -120,12 +120,27 @@ void ProgramChangeCommand::addToQueue(const GraphicsState& theState, CommandQueu
 
 	// Add all global uniforms to the queue as well
 	// test text oinput
-	RegistryDataItem* uniformData = theState.stateData("globalUniforms");
-	for (auto anUniform : uniformData->childData)
+	if (!m_globalUniformsItem)
 	{
-		if (!anUniform.second->isUniformData())
+		auto& registry = theState.stateData();
+		m_globalUniformsItem = registry.item_at("/globalUniforms");
+		if (!m_globalUniformsItem)
+		{
+			//m_globalUniformsItem = registry.createItemAt("/", "globalUniforms", )
+			return;
+		}
+		m_uniformsitemSentry.reset(new LifetimeObserver{ m_globalUniformsItem, [this]() {
+			m_globalUniformsItem = nullptr;
+		}});
+	}
+	//RegistryDataItem* uniformData = theState.stateData("globalUniforms");
+	for (auto anUniformIter = m_globalUniformsItem->cbegin(); anUniformIter != m_globalUniformsItem->cend(); ++anUniformIter)
+	{
+		//if (!anUniform.second->isUniformData())
+		//	continue;
+		if (!anUniformIter->second->isValueOf<std::shared_ptr<Uniform>>())
 			continue;
-		std::shared_ptr<Uniform> realData = anUniform.second->asUniform(anUniform.first);
+		std::shared_ptr<Uniform> realData = anUniformIter->second->as<std::shared_ptr<Uniform>>();
 		std::make_shared<UniformChangeCommand>(realData)->addToQueue(theState, commandQueue);
 	}
 }
@@ -143,19 +158,36 @@ m_uniform(newUniform)
 
 void UniformChangeCommand::apply(GraphicsState& theState)
 {
-	RegistryDataItem* programData = theState.stateData("shaderProgram");
-	if (!programData || !programData->isA<ProgramStateData>())
+	//RegistryDataItem* programData = theState.stateData("shaderProgram");
+	if (!m_shaderItem)
+	{
+		m_shaderItem = theState.stateData().item_at("/shaderProgram");
+		if (m_shaderItem)
+		{
+			m_shaderItemSentry.reset(new LifetimeObserver{ m_shaderItem, [this]() {
+				m_shaderItem = nullptr;
+			} });
+		}
+	}
+	if (!m_shaderItem || !m_shaderItem->isValueOf<std::shared_ptr<ShaderProgram>>())
 	{
 		std::cerr << "Cannot retrieve current shader program from GraphicsState, line " << __LINE__ << " file " << __FILE__ << std::endl;
 		return;
 	}
 	std::string uniformName = m_uniform->name();
-	if (programData->childData.count(uniformName) == 0 || ! m_uniform->checkData(programData->childData[uniformName]))
+	GraphicsStateRegistryItemPtr uniformData = theState.stateData().item_at(uniformName, m_shaderItem);
+	if (uniformData == nullptr || ! m_uniform->isEqual(* uniformData->as<std::shared_ptr<Uniform>>().get()))
 	{
 		// program doesn't have a uniform yet or it is not set to the required value
-		ProgramStateData* realData = static_cast<ProgramStateData*>(programData);
-		m_uniform->apply(realData->data.get());
-		realData->childData[m_uniform->name()] = m_uniform->createStateData();
+		//ProgramStateData* realData = static_cast<ProgramStateData*>(programData);
+		m_uniform->apply(m_shaderItem->as<std::shared_ptr<ShaderProgram>>().get());
+		//realData->childData[m_uniform->name()] = m_uniform->createStateData();
+		if (uniformData)
+			uniformData->setValue(m_uniform);
+		else
+		{
+			theState.stateData().createItemAt("/shaderProgram", uniformName, m_uniform);
+		}
 	}
 }
 
@@ -219,8 +251,9 @@ CommandQueue::AddToQueueOp UniformChangeCommand::canAddToQueue(CommandQueue::que
 
 void UniformChangeCommand::waitingSweep(GraphicsState const& theState) const
 {
-	RegistryDataItem* currProgram = theState.stateData("shaderProgram");
-	if (!currProgram || !currProgram->isA<ProgramStateData>())
+	//RegistryDataItem* currProgram = theState.stateData("shaderProgram");
+	//if (!currProgram || !currProgram->isA<ProgramStateData>())
+	if (! theState.stateData().item_at("/shaderProgram"))
 	{
 		std::cerr << "Applying uniform with no program chosen\n";
 	}

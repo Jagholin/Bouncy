@@ -3,14 +3,16 @@
 #include <glm/mat4x4.hpp>
 #include <istream>
 #include <unordered_map>
+#include "state.h"
 class ShaderProgram;
 
 class SceneNode;
 class GraphicsState;
-class RegistryDataItem;
+
 class Camera;
 class Drawable;
 class CameraNode;
+
 class GraphicsScene
 {
 public:
@@ -40,6 +42,7 @@ protected:
 	GraphicsState* m_state;
 
 	// GraphicsState registry entry on global uniforms
-	RegistryDataItem* m_uniformsData;
+	GraphicsStateRegistryItemPtr m_uniformsData;
+	std::shared_ptr<GlmUniform<glm::mat4>> m_projUniform, m_viewUniform;
 	Camera* m_camera;
 };

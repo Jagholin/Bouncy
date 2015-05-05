@@ -59,8 +59,8 @@ public:
 	//typedef TypedStateData<std::shared_ptr<ShaderProgram>> ProgramStateData;
 protected:
 	std::shared_ptr<ShaderProgram> m_program;
-	std::unique_ptr<LifetimeObserver> m_dataitemSentry;
-	GraphicsStateRegistryItemPtr m_currentShaderItem;
+	std::unique_ptr<LifetimeObserver> m_dataitemSentry, m_uniformsitemSentry;
+	GraphicsStateRegistryItemPtr m_currentShaderItem, m_globalUniformsItem;
 };
 
 class Uniform;
@@ -80,5 +80,7 @@ public:
 	//typedef TypedStateData<std::shared_ptr<ShaderProgram>> ProgramStateData;
 protected:
 	std::shared_ptr<Uniform>  m_uniform;
+	std::unique_ptr<LifetimeObserver> m_shaderItemSentry;
+	GraphicsStateRegistryItemPtr m_shaderItem;
 };
 

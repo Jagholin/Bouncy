@@ -94,6 +94,11 @@ GraphicsStateRegistry & GraphicsState::stateData()
 	return m_stateData;
 }
 
+const GraphicsStateRegistry & GraphicsState::stateData() const 
+{
+	return m_stateData;
+}
+
 void GraphicsState::commit()
 {
 	// Compile compound StateSet from stack

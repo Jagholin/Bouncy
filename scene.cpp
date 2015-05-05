@@ -92,21 +92,25 @@ void GraphicsScene::init()
 	//m_pyramid = generateSphere();
 	//m_rootNode->addDrawable(generateSphere());
 	m_rootNode->stateSet().addElement("shaderProgram", std::make_shared<ProgramStateElement>(myProgram));
+	auto &registry = m_state->stateData();
 
-	m_uniformsData = m_state->stateData("globalUniforms");
+	m_uniformsData = registry.item_at("/globalUniforms");
 	if (!m_uniformsData)
 	{
-		m_state->setStateData("globalUniforms", std::make_shared<RegistryDataItem>());
-		m_uniformsData = m_state->stateData("globalUniforms");
+		//m_state->setStateData("globalUniforms", std::make_shared<RegistryDataItem>());
+		//m_uniformsData = m_state->stateData("globalUniforms");
+		m_uniformsData = registry.createItemAt("/", "globalUniforms", NullType{});
 	}
 
 	if (m_camera)
 	{
-		m_uniformsData->childData["projectionMatrix"] = std::make_shared<UniformStateData<glm::mat4>>(m_camera->projectionMatrix());
-		m_uniformsData->childData["viewMatrix"] = std::make_shared<UniformStateData<glm::mat4>>(m_camera->viewMatrix());
+		m_projUniform = std::make_shared<GlmUniform<glm::mat4>>("projectionMatrix", m_camera->projectionMatrix());
+		m_viewUniform = std::make_shared<GlmUniform<glm::mat4>>("viewMatrix", m_camera->viewMatrix());
+		registry.createItemAt(m_uniformsData, "projectionMatrix", m_projUniform);
+		//m_uniformsData->childData["projectionMatrix"] = std::make_shared<UniformStateData<glm::mat4>>(m_camera->projectionMatrix());
+		registry.createItemAt(m_uniformsData, "viewMatrix", m_viewUniform);
+		//m_uniformsData->childData["viewMatrix"] = std::make_shared<UniformStateData<glm::mat4>>(m_camera->viewMatrix());
 	}
-
-
 }
 
 void GraphicsScene::render()
@@ -114,14 +118,19 @@ void GraphicsScene::render()
 	//m_program->use();
 	//m_pyramid->render();
 	//sf::Shader::bind(nullptr);
-	m_uniformsData = m_state->stateData("globalUniforms");
+	//m_uniformsData = m_statex
+	//	->stateData("globalUniforms");
 
 	if (m_camera)
 	{
 		if (! m_activeCameraNode.expired())
 			m_camera->setActiveCameraNode(m_activeCameraNode);
-		m_uniformsData->childData["projectionMatrix"] = std::make_shared<UniformStateData<glm::mat4>>(m_camera->projectionMatrix());
-		m_uniformsData->childData["viewMatrix"] = std::make_shared<UniformStateData<glm::mat4>>(m_camera->viewMatrix());
+		//auto &registry = m_state->stateData();
+		//registry.createItemAt(m_uniformsData, "projectionMatrix")
+		//m_uniformsData->childData["projectionMatrix"] = std::make_shared<UniformStateData<glm::mat4>>(m_camera->projectionMatrix());
+		//m_uniformsData->childData["viewMatrix"] = std::make_shared<UniformStateData<glm::mat4>>(m_camera->viewMatrix());
+		m_projUniform->setValue(m_camera->projectionMatrix());
+		m_viewUniform->setValue(m_camera->viewMatrix());
 	}
 	m_rootNode->render(*m_state);
 }

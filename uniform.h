@@ -4,7 +4,6 @@
 #include <memory>
 #include <glm/fwd.hpp>
 
-class RegistryDataItem;
 class ShaderProgram;
 class Uniform
 {
@@ -15,10 +14,10 @@ public:
 	virtual void apply(ShaderProgram*) = 0;
 	bool overrides(const Uniform& otherUniform);
 
-	virtual bool checkData(std::shared_ptr<RegistryDataItem> const &data) = 0;
-	virtual std::shared_ptr<RegistryDataItem> createStateData() = 0;
+	virtual bool isEqual(const Uniform& rhs) const;
 
 	std::string name() const;
+	virtual unsigned int type() const;
 
 protected:
 	std::string m_name;
@@ -48,19 +47,40 @@ public:
 		apply_impl(prog, m_value);
 	}
 
-	virtual bool checkData(std::shared_ptr<RegistryDataItem> const &data) override
+	bool isEqual(const Uniform& rhs) const override;
+
+	unsigned int type() const override 
 	{
-		if (!data->isA<UniformStateData<GlmT>>())
-			return false;
-		const GlmT rvalue = static_cast<UniformStateData<GlmT>*>(data.get())->data;
-		return rvalue == m_value;
+		return m_type;
 	}
 
-	virtual std::shared_ptr<RegistryDataItem> createStateData() override
+	void setValue(GlmT newVal)
 	{
-		return std::make_shared<UniformStateData<GlmT>>(m_value);
+		m_value = std::move(newVal);
 	}
 
 protected:
 	GlmT m_value;
+	static const int m_type;
 };
+
+template<class GlmT>
+bool GlmUniform<GlmT>::isEqual(const Uniform& rhs) const
+{
+	if (rhs.name() != name())
+		return false;
+	if (rhs.type() != type())
+		return false;
+	const GlmUniform<GlmT>* realRhs = static_cast<const GlmUniform<GlmT>*>(&rhs);
+	return realRhs->m_value == m_value;
+}
+
+namespace detail {
+	unsigned int genNextType() {
+		static unsigned int currType = 0;
+		return ++currType;
+	}
+}
+
+template <typename T>
+const int GlmUniform<T>::m_type = detail::genNextType();
