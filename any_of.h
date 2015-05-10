@@ -158,7 +158,7 @@ public:
 	bool isA() const {
 		using namespace anyof_details;
 		//return m_typeDesc == type_index<T, Types...>::value;
-		return m_conversionTable[type_index<T, Types...>::value][m_typeDesc].first;
+		return m_conversionTable[m_typeDesc][type_index<T, Types...>::value].first;
 	}
 
 	any_type& operator=(any_type&& rhs) {
@@ -217,9 +217,9 @@ T& as(const any_of<S, Types...>& myAny)
 	if (type_index<T, Types...>::value == myAny.m_typeDesc)
 		return *(reinterpret_cast<T*>(myAny.m_object));
 
-	if (any_of<S, Types...>::m_conversionTable[type_index<T, Types...>::value][myAny.m_typeDesc].first) {
+	if (any_of<S, Types...>::m_conversionTable[myAny.m_typeDesc][type_index<T, Types...>::value].first) {
 		// Conversion to T possible, performing...
-		return *(reinterpret_cast<T*>(any_of<S, Types...>::m_conversionTable[type_index<T, Types...>::value][myAny.m_typeDesc].second(myAny.m_object)));
+		return *(reinterpret_cast<T*>(any_of<S, Types...>::m_conversionTable[myAny.m_typeDesc][type_index<T, Types...>::value].second(myAny.m_object)));
 	}
 	throw std::exception("any_of cannot be cast to this datatype.");
 }

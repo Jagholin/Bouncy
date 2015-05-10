@@ -10,11 +10,11 @@ private:
     int m_objid;
 public:
 	InnerRefcounter() : m_counter(0) {
-        m_objid = ++objid;
-        std::cout << "Ctor countered " << m_objid << std::endl;
+        //m_objid = ++objid;
+        //std::cout << "Ctor countered " << m_objid << std::endl;
 	}
     virtual ~InnerRefcounter() {
-        std::cout << "Destr countered " << m_objid << std::endl;
+        //std::cout << "Destr countered " << m_objid << std::endl;
     }
 	void addref() {
 		++m_counter;
