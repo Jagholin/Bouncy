@@ -4,6 +4,7 @@
 #include <istream>
 #include <unordered_map>
 #include "state.h"
+#include "ref_ptr.h"
 class ShaderProgram;
 
 class SceneNode;
@@ -43,6 +44,6 @@ protected:
 
 	// GraphicsState registry entry on global uniforms
 	GraphicsStateRegistryItemPtr m_uniformsData;
-	std::shared_ptr<GlmUniform<glm::mat4>> m_projUniform, m_viewUniform;
+	ref_ptr<GlmUniform<glm::mat4>> m_projUniform, m_viewUniform;
 	Camera* m_camera;
 };

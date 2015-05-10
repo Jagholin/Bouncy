@@ -86,7 +86,7 @@ void GraphicsScene::initPyramid()
 
 void GraphicsScene::init()
 {
-	auto myProgram = std::make_shared<ShaderProgram>();
+	auto myProgram = make_ref<ShaderProgram>();
 	myProgram->loadFromFile("shaders/vertex.txt", "shaders/fragment.txt");
 	//m_program->loadFromFile("shaders/vertex.txt", "shaders/fragment.txt");
 	//m_pyramid = generateSphere();
@@ -104,8 +104,8 @@ void GraphicsScene::init()
 
 	if (m_camera)
 	{
-		m_projUniform = std::make_shared<GlmUniform<glm::mat4>>("projectionMatrix", m_camera->projectionMatrix());
-		m_viewUniform = std::make_shared<GlmUniform<glm::mat4>>("viewMatrix", m_camera->viewMatrix());
+		m_projUniform = make_ref<GlmUniform<glm::mat4>>("projectionMatrix", m_camera->projectionMatrix());
+		m_viewUniform = make_ref<GlmUniform<glm::mat4>>("viewMatrix", m_camera->viewMatrix());
 		registry.createItemAt(m_uniformsData, "projectionMatrix", m_projUniform);
 		//m_uniformsData->childData["projectionMatrix"] = std::make_shared<UniformStateData<glm::mat4>>(m_camera->projectionMatrix());
 		registry.createItemAt(m_uniformsData, "viewMatrix", m_viewUniform);
@@ -193,7 +193,7 @@ void GraphicsScene::loadFromStream(std::istream& aStream)
 
 			objectName.clear();
 			objectMatrix = glm::mat4(1.0f);
-			cameraFov = M_PI / 3.0f;
+			cameraFov = ((float)M_PI) / 3.0f;
 			cameraNear = 0.01f;
 			cameraFar = 100000.0f;
 		};

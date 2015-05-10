@@ -2,8 +2,9 @@
 #include <GL/glew.h>
 #include <string>
 #include <unordered_map>
+#include "ref_ptr.h"
 
-class ShaderProgram
+class ShaderProgram : public InnerRefcounter
 {
 public:
 	ShaderProgram();

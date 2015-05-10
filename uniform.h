@@ -3,9 +3,10 @@
 #include <string>
 #include <memory>
 #include <glm/fwd.hpp>
+#include "ref_ptr.h"
 
 class ShaderProgram;
-class Uniform
+class Uniform : public InnerRefcounter
 {
 public:
 	Uniform(const std::string& name);
@@ -14,10 +15,10 @@ public:
 	virtual void apply(ShaderProgram*) = 0;
 	bool overrides(const Uniform& otherUniform);
 
-	virtual bool isEqual(const Uniform& rhs) const;
+	virtual bool isEqual(const Uniform& rhs) const = 0;
 
 	std::string name() const;
-	virtual unsigned int type() const;
+	virtual unsigned int type() const = 0;
 
 protected:
 	std::string m_name;
@@ -76,7 +77,7 @@ bool GlmUniform<GlmT>::isEqual(const Uniform& rhs) const
 }
 
 namespace detail {
-	unsigned int genNextType() {
+	inline unsigned int genNextType() {
 		static unsigned int currType = 0;
 		return ++currType;
 	}

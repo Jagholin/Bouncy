@@ -2,6 +2,9 @@
 #include "meshgenerator.h"
 #include <cmath>
 
+#define M_PIF ((float)M_PI)
+#define M_PI_2F ((float)M_PI_2)
+
 std::shared_ptr<EditableMesh> generateSphere()
 {
 	EditableMesh* newMesh = new EditableMesh;
@@ -28,25 +31,25 @@ std::shared_ptr<EditableMesh> generateSphere()
 
 		if (layer == 0)
 		{
-			newMesh->addTriangle(topVertex, vertexFor(M_PI_2 - M_PI / 12.0f, slice*(M_PI / 15.0f)), vertexFor(M_PI_2 - M_PI / 12.0f, (slice + 1)*(M_PI / 15.0f)));
+			newMesh->addTriangle(topVertex, vertexFor(M_PI_2F - M_PIF / 12.0f, slice*(M_PIF / 15.0f)), vertexFor(M_PI_2F - M_PIF / 12.0f, (slice + 1)*(M_PIF / 15.0f)));
 		}
 		else if (layer == 11)
 		{
-			newMesh->addTriangle(vertexFor(-M_PI_2 + M_PI / 12.0f, (slice + 1)*(M_PI / 15.0f)), vertexFor(-M_PI_2 + M_PI / 12.0f, slice*(M_PI / 15.0f)), vertexFor(-M_PI_2, 0));
+			newMesh->addTriangle(vertexFor(-M_PI_2F + M_PIF / 12.0f, (slice + 1)*(M_PIF / 15.0f)), vertexFor(-M_PI_2F + M_PIF / 12.0f, slice*(M_PIF / 15.0f)), vertexFor(-M_PI_2F, 0));
 		}
 		else
 		{
 			if (i % 2 == 0)
 			{
-				newMesh->addTriangle(vertexFor(M_PI_2 - layer*(M_PI / 12.0f), slice * (M_PI / 15.0f)),
-					vertexFor(M_PI_2 - (layer + 1)*(M_PI / 12.0f), slice * (M_PI / 15.0f)),
-					vertexFor(M_PI_2 - (layer + 1)*(M_PI / 12.0f), (slice + 1) * (M_PI / 15.0f)));
+				newMesh->addTriangle(vertexFor(M_PI_2F - layer*(M_PIF / 12.0f), slice * (M_PIF / 15.0f)),
+					vertexFor(M_PI_2F - (layer + 1)*(M_PIF / 12.0f), slice * (M_PIF / 15.0f)),
+					vertexFor(M_PI_2F - (layer + 1)*(M_PIF / 12.0f), (slice + 1) * (M_PIF / 15.0f)));
 			}
 			else
 			{
-				newMesh->addTriangle(vertexFor(M_PI_2 - layer*(M_PI / 12.0f), (slice + 1) * (M_PI / 15.0f)),
-					vertexFor(M_PI_2 - layer*(M_PI / 12.0f), slice * (M_PI / 15.0f)),
-					vertexFor(M_PI_2 - (layer + 1)*(M_PI / 12.0f), (slice+1) * (M_PI / 15.0f)));
+				newMesh->addTriangle(vertexFor(M_PI_2F - layer*(M_PIF / 12.0f), (slice + 1) * (M_PIF / 15.0f)),
+					vertexFor(M_PI_2F - layer*(M_PIF / 12.0f), slice * (M_PIF / 15.0f)),
+					vertexFor(M_PI_2F - (layer + 1)*(M_PIF / 12.0f), (slice+1) * (M_PIF / 15.0f)));
 			}
 		}
 	}

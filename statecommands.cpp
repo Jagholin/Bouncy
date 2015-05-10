@@ -67,8 +67,8 @@ void StateChangeCommand::waitingSweep(GraphicsState const&) const
 
 }
 
-ProgramChangeCommand::ProgramChangeCommand(const std::shared_ptr<ShaderProgram>& newProgram) :
-m_program(newProgram)
+ProgramChangeCommand::ProgramChangeCommand(const ref_ptr<ShaderProgram>& newProgram) :
+m_program(newProgram), m_currentShaderItem(nullptr), m_globalUniformsItem(nullptr)
 {
 	// no-op
 }
@@ -80,12 +80,12 @@ void ProgramChangeCommand::apply(GraphicsState& theState)
 	{
 		GraphicsStateRegistry& stateRegistry = theState.stateData();
 		m_currentShaderItem = stateRegistry.item_at("/shaderProgram");
-		if (!m_currentShaderItem || !m_currentShaderItem->isValueOf<std::shared_ptr<ShaderProgram>>())
+		if (!m_currentShaderItem || !m_currentShaderItem->isValueOf<ShaderProgram>())
 		{
 			if (m_currentShaderItem)
 			{
 				// !myData->isA<GLObjectStateData>()
-				std::cerr << "myData is not a shared_ptr<ShaderProgram>, line " << __LINE__ << " file " << __FILE__ << std::endl;
+				std::cerr << "myData is not a <ShaderProgram>, line " << __LINE__ << " file " << __FILE__ << std::endl;
 			}
 			// No current program applied, apply this one
 			m_program->use();
@@ -98,7 +98,7 @@ void ProgramChangeCommand::apply(GraphicsState& theState)
 	}
 
 	//ProgramStateData* realData = static_cast<ProgramStateData*>(myData);
-	auto realData = m_currentShaderItem->as<std::shared_ptr<ShaderProgram>>();
+	auto realData = m_currentShaderItem->as<ref_ptr<ShaderProgram>>();
 	if (realData == m_program)
 		return;
 	m_program->use();
@@ -138,9 +138,9 @@ void ProgramChangeCommand::addToQueue(const GraphicsState& theState, CommandQueu
 	{
 		//if (!anUniform.second->isUniformData())
 		//	continue;
-		if (!anUniformIter->second->isValueOf<std::shared_ptr<Uniform>>())
+		if (!anUniformIter->second->isValueOf<ref_ptr<Uniform>>())
 			continue;
-		std::shared_ptr<Uniform> realData = anUniformIter->second->as<std::shared_ptr<Uniform>>();
+		ref_ptr<Uniform> realData = anUniformIter->second->as<ref_ptr<Uniform>>();
 		std::make_shared<UniformChangeCommand>(realData)->addToQueue(theState, commandQueue);
 	}
 }
@@ -150,8 +150,8 @@ StateChangeCommand::CommandType ProgramChangeCommand::type() const
 	return StateChangeCommand::PROGRAMCHANGE;
 }
 
-UniformChangeCommand::UniformChangeCommand(const std::shared_ptr<Uniform>& newUniform):
-m_uniform(newUniform)
+UniformChangeCommand::UniformChangeCommand(const ref_ptr<Uniform>& newUniform):
+m_uniform(newUniform), m_shaderItem(nullptr)
 {
 
 }
@@ -169,18 +169,18 @@ void UniformChangeCommand::apply(GraphicsState& theState)
 			} });
 		}
 	}
-	if (!m_shaderItem || !m_shaderItem->isValueOf<std::shared_ptr<ShaderProgram>>())
+	if (!m_shaderItem || !m_shaderItem->isValueOf<ref_ptr<ShaderProgram>>())
 	{
 		std::cerr << "Cannot retrieve current shader program from GraphicsState, line " << __LINE__ << " file " << __FILE__ << std::endl;
 		return;
 	}
 	std::string uniformName = m_uniform->name();
 	GraphicsStateRegistryItemPtr uniformData = theState.stateData().item_at(uniformName, m_shaderItem);
-	if (uniformData == nullptr || ! m_uniform->isEqual(* uniformData->as<std::shared_ptr<Uniform>>().get()))
+	if (uniformData == nullptr || ! m_uniform->isEqual(* uniformData->as<ref_ptr<Uniform>>().get()))
 	{
 		// program doesn't have a uniform yet or it is not set to the required value
 		//ProgramStateData* realData = static_cast<ProgramStateData*>(programData);
-		m_uniform->apply(m_shaderItem->as<std::shared_ptr<ShaderProgram>>().get());
+		m_uniform->apply(m_shaderItem->as<ref_ptr<ShaderProgram>>().get());
 		//realData->childData[m_uniform->name()] = m_uniform->createStateData();
 		if (uniformData)
 			uniformData->setValue(m_uniform);

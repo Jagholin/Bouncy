@@ -26,6 +26,7 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>
     <SccProvider>SAK</SccProvider>
+    <TargetPlatformVersion>8.1</TargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -37,7 +38,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -50,7 +51,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -154,10 +155,12 @@
     <ClCompile Include="cameranode.cpp" />
     <ClCompile Include="glerror.cpp" />
     <ClCompile Include="lampnode.cpp" />
+    <ClCompile Include="lifetimeobserver.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mesh.cpp" />
     <ClCompile Include="meshgenerator.cpp" />
     <ClCompile Include="osdialogs.cpp" />
+    <ClCompile Include="ref_ptr.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="scenenode.cpp" />
     <ClCompile Include="shader.cpp" />
@@ -174,9 +177,11 @@
     <ClInclude Include="drawable.h" />
     <ClInclude Include="glerror.h" />
     <ClInclude Include="lampnode.h" />
+    <ClInclude Include="lifetimeobserver.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="meshgenerator.h" />
     <ClInclude Include="osdialogs.h" />
+    <ClInclude Include="ref_ptr.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="scenenode.h" />
     <ClInclude Include="shader.h" />

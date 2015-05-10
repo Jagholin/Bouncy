@@ -1,6 +1,8 @@
 #pragma once
 #include <memory>
 #include <glm/mat4x4.hpp>
+#include "shader.h"
+#include "ref_ptr.h"
 
 class CommandQueue;
 class GraphicsState;
@@ -43,17 +45,15 @@ protected:
 	glm::mat4 m_transform;
 };
 
-class ShaderProgram;
-
 class ProgramStateElement : public GraphicsStateElement
 {
 public:
-	ProgramStateElement(std::shared_ptr<ShaderProgram> const& program);
+	ProgramStateElement(ref_ptr<ShaderProgram> const& program);
 
 	virtual void apply(GraphicsState& theState, CommandQueue& commQueue) override;
 
 	virtual std::shared_ptr<GraphicsStateElement> copy() const override;
 
 protected:
-	std::shared_ptr<ShaderProgram> m_program;
+	ref_ptr<ShaderProgram> m_program;
 };

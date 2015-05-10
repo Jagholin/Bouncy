@@ -6,7 +6,6 @@ std::string getOpenFileName()
 	OPENFILENAMEA ofn;       // common dialog box structure
 	char szFile[260];       // buffer for file name
 	HWND hwnd = 0;              // owner window
-	HANDLE hf;              // file handle
 
 	// Initialize OPENFILENAME
 	ZeroMemory(&ofn, sizeof(ofn));

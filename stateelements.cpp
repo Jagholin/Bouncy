@@ -42,7 +42,7 @@ void ModelTransformStateElement::setTransform(glm::mat4 newMatrix)
 
 void ModelTransformStateElement::apply(GraphicsState& theState, CommandQueue& commQueue)
 {
-	std::make_shared<UniformChangeCommand>(std::make_shared<GlmUniform<glm::mat4>>("modelMatrix", m_transform))->addToQueue(theState, commQueue);
+	std::make_shared<UniformChangeCommand>(ref_ptr<GlmUniform<glm::mat4>>(new GlmUniform<glm::mat4>("modelMatrix", m_transform)))->addToQueue(theState, commQueue);
 }
 
 std::shared_ptr<GraphicsStateElement> ModelTransformStateElement::combineWith(const std::shared_ptr<GraphicsStateElement>& rhs)
@@ -62,7 +62,7 @@ std::shared_ptr<GraphicsStateElement> ModelTransformStateElement::copy() const
 	return std::make_shared<ModelTransformStateElement>(*this);
 }
 
-ProgramStateElement::ProgramStateElement(std::shared_ptr<ShaderProgram> const& program) : m_program(program)
+ProgramStateElement::ProgramStateElement(ref_ptr<ShaderProgram> const& program) : m_program(program)
 {
 
 }

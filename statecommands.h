@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "state.h"
+#include "ref_ptr.h"
 
 class StateChangeCommand;
 class GraphicsState;
@@ -49,7 +50,7 @@ class ShaderProgram;
 class ProgramChangeCommand : public StateChangeCommand
 {
 public:
-	ProgramChangeCommand(const std::shared_ptr<ShaderProgram>& newProgram);
+	ProgramChangeCommand(const ref_ptr<ShaderProgram>& newProgram);
 
 	void apply(GraphicsState& theState) override;
 	void addToQueue(const GraphicsState& theState, CommandQueue& commandQueue) override;
@@ -58,7 +59,7 @@ public:
 
 	//typedef TypedStateData<std::shared_ptr<ShaderProgram>> ProgramStateData;
 protected:
-	std::shared_ptr<ShaderProgram> m_program;
+	ref_ptr<ShaderProgram> m_program;
 	std::unique_ptr<LifetimeObserver> m_dataitemSentry, m_uniformsitemSentry;
 	GraphicsStateRegistryItemPtr m_currentShaderItem, m_globalUniformsItem;
 };
@@ -67,7 +68,7 @@ class Uniform;
 class UniformChangeCommand : public StateChangeCommand
 {
 public:
-	UniformChangeCommand(const std::shared_ptr<Uniform>& newUniform);
+	UniformChangeCommand(const ref_ptr<Uniform>& newUniform);
 
 	void apply(GraphicsState& theState) override;
 	void addToQueue(const GraphicsState& theState, CommandQueue& commandQueue) override;
@@ -79,7 +80,7 @@ public:
 
 	//typedef TypedStateData<std::shared_ptr<ShaderProgram>> ProgramStateData;
 protected:
-	std::shared_ptr<Uniform>  m_uniform;
+	ref_ptr<Uniform>  m_uniform;
 	std::unique_ptr<LifetimeObserver> m_shaderItemSentry;
 	GraphicsStateRegistryItemPtr m_shaderItem;
 };

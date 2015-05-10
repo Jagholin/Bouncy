@@ -58,7 +58,7 @@ bool ShaderProgram::loadFromFile(std::string const& vertexShader, std::string co
 
 	std::string contentString{ std::istreambuf_iterator<char>(vertexFile), std::istreambuf_iterator<char>() };
 	const char* fileContent = contentString.c_str();
-	int fileSize = contentString.size();
+	GLint fileSize = static_cast<GLint>(contentString.size());
 	glShaderSource(m_vShader, 1, &fileContent, &fileSize);
 	check_gl_error();
 	glCompileShader(m_vShader);
@@ -78,7 +78,7 @@ bool ShaderProgram::loadFromFile(std::string const& vertexShader, std::string co
 
 	contentString.assign( std::istreambuf_iterator<char>(fragmentFile), std::istreambuf_iterator<char>() );
 	fileContent = contentString.c_str();
-	fileSize = contentString.size();
+	fileSize = static_cast<GLint>(contentString.size());
 	glShaderSource(m_fShader, 1, &(fileContent), &fileSize);
 	check_gl_error();
 	glCompileShader(m_fShader);
