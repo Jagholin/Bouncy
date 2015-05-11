@@ -53,7 +53,9 @@ public:
 	//void setStateData(std::string name, std::shared_ptr<RegistryDataItem> stateData);
 	GraphicsStateRegistry& stateData();
 	const GraphicsStateRegistry& stateData() const;
-	void commit();
+	//void commit();
+
+    CommandQueue compileStateCommands();
 
 	friend class ApplyStateSet;
 

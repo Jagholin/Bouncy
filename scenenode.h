@@ -5,6 +5,7 @@
 #include <deque>
 
 #include "drawable.h"
+#include "statecommands.h"
 
 class GraphicsStateSet;
 class GraphicsState;
@@ -28,7 +29,7 @@ public:
 	SceneNode& operator=(const SceneNode&)=delete;
 	SceneNode& operator=(SceneNode&&)=delete;
 
-	void render(GraphicsState& aState, bool recursive = true);
+	virtual CommandQueue render(GraphicsState& aState, bool recursive = true);
 	void setNodeTransform(const glm::mat4& newTransform);
 
 	void addDrawable(const std::shared_ptr<Drawable>& aDrawable);

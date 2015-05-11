@@ -99,22 +99,28 @@ const GraphicsStateRegistry & GraphicsState::stateData() const
 	return m_stateData;
 }
 
-void GraphicsState::commit()
+/*void GraphicsState::commit()
 {
 	// Compile compound StateSet from stack
+    auto commandQueue = compileStateCommands().queue(*this);
+	for (auto aCommand : commandQueue)
+	{
+		aCommand->apply(*this);
+	}
+
+	m_currentState = newSet;
+}*/
+
+CommandQueue GraphicsState::compileStateCommands()
+{
 	GraphicsStateSet newSet;
 	for (auto aSet : m_stateStack)
 	{
 		newSet += aSet;
 	}
 	GraphicsStateSet diff = newSet - m_currentState;
-	CommandQueue myCommands{ diff.asCommandQueue(*this) };
-	auto commandQueue = myCommands.queue(*this);
-	for (auto aCommand : commandQueue)
-	{
-		aCommand->apply(*this);
-	}
-	m_currentState = newSet;
+
+	return diff.asCommandQueue(*this);
 }
 
 ApplyStateSet::ApplyStateSet(GraphicsState& theState, GraphicsStateSet& aSet) :

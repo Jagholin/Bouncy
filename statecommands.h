@@ -6,7 +6,7 @@
 #include "state.h"
 #include "ref_ptr.h"
 
-class StateChangeCommand;
+class RenderCommand;
 class GraphicsState;
 class CommandQueue
 {
@@ -18,23 +18,23 @@ public:
 	CommandQueue(const CommandQueue&) = delete;
 	CommandQueue(CommandQueue&&);
 
-	std::deque<std::shared_ptr<StateChangeCommand>>& queue(GraphicsState const&, bool finalize = true);
-	void priv_addToQueue(std::shared_ptr<StateChangeCommand> const& command);
-	void priv_addToWaitlist(std::shared_ptr<StateChangeCommand> const& command);
+	std::deque<std::shared_ptr<RenderCommand>>& queue(GraphicsState const&, bool finalize = true);
+	void priv_addToQueue(std::shared_ptr<RenderCommand> const& command);
+	void priv_addToWaitlist(std::shared_ptr<RenderCommand> const& command);
 
-	typedef std::deque<std::shared_ptr<StateChangeCommand>> queue_type;
+	typedef std::deque<std::shared_ptr<RenderCommand>> queue_type;
 	typedef queue_type::const_iterator iterator_type;
 protected:
-	std::deque<std::shared_ptr<StateChangeCommand>> m_queue, m_waitlist;
+	std::deque<std::shared_ptr<RenderCommand>> m_queue, m_waitlist;
 };
 
-class StateChangeCommand : protected std::enable_shared_from_this<StateChangeCommand>
+class RenderCommand : protected std::enable_shared_from_this<RenderCommand>
 {
 public:
 	enum CommandType {
-		PROGRAMCHANGE, UNIFORMCHANGE
+		PROGRAMCHANGE, UNIFORMCHANGE, DRAWELEMENTSDRAW
 	};
-	virtual ~StateChangeCommand() = default;
+	virtual ~RenderCommand() = default;
 
 	virtual void apply(GraphicsState& theState) = 0;
 	virtual void addToQueue(const GraphicsState& theState, CommandQueue& commandQueue)
@@ -47,7 +47,7 @@ public:
 };
 
 class ShaderProgram;
-class ProgramChangeCommand : public StateChangeCommand
+class ProgramChangeCommand : public RenderCommand
 {
 public:
 	ProgramChangeCommand(const ref_ptr<ShaderProgram>& newProgram);
@@ -65,7 +65,7 @@ protected:
 };
 
 class Uniform;
-class UniformChangeCommand : public StateChangeCommand
+class UniformChangeCommand : public RenderCommand
 {
 public:
 	UniformChangeCommand(const ref_ptr<Uniform>& newUniform);

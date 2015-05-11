@@ -9,6 +9,7 @@
 #include "state.h"
 #include "camera.h"
 #include "cameranode.h"
+#include "statecommands.h"
 
 #include <cmath>
 #include <glm/glm.hpp>
@@ -132,7 +133,8 @@ void GraphicsScene::render()
 		m_projUniform->setValue(m_camera->projectionMatrix());
 		m_viewUniform->setValue(m_camera->viewMatrix());
 	}
-	m_rootNode->render(*m_state);
+    CommandQueue renderQueue = m_rootNode->render(*m_state);
+
 }
 
 void GraphicsScene::setCamera(Camera* cam)

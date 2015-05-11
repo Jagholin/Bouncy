@@ -128,14 +128,14 @@ public:
 
 	template <typename R>
 	ref_ptr(const ref_ptr<R>& rhs) : m_data(rhs.m_data) {
-        std::cout << "ref_ptr copy" << std::endl;
+        //std::cout << "ref_ptr copy" << std::endl;
 		static_assert(std::is_convertible<R*, T*>::value, "An implicit conversion R* -> T* must be possible");
 		if (m_data)
 			m_data->addref();
 	}
 
     ref_ptr(const ref_ptr<T>& rhs) : m_data(rhs.m_data) {
-        std::cout << "ref_ptr copy2" << std::endl;
+        //std::cout << "ref_ptr copy2" << std::endl;
         if (m_data)
             m_data->addref();
     }

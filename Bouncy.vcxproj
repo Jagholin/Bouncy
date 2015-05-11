@@ -153,6 +153,7 @@
     <ClCompile Include="buffer.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="cameranode.cpp" />
+    <ClCompile Include="drawcommands.cpp" />
     <ClCompile Include="glerror.cpp" />
     <ClCompile Include="lampnode.cpp" />
     <ClCompile Include="lifetimeobserver.cpp" />
@@ -175,6 +176,7 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="cameranode.h" />
     <ClInclude Include="drawable.h" />
+    <ClInclude Include="drawcommands.h" />
     <ClInclude Include="glerror.h" />
     <ClInclude Include="lampnode.h" />
     <ClInclude Include="lifetimeobserver.h" />
