@@ -133,8 +133,13 @@ void GraphicsScene::render()
 		m_projUniform->setValue(m_camera->projectionMatrix());
 		m_viewUniform->setValue(m_camera->viewMatrix());
 	}
-    CommandQueue renderQueue = m_rootNode->render(*m_state);
+	CommandQueue renderQueue;
+	m_rootNode->render(*m_state, m_state->currentState(), renderQueue, true);
 
+	for (auto command : renderQueue.queue(*m_state))
+	{
+		command->apply(*m_state);
+	}
 }
 
 void GraphicsScene::setCamera(Camera* cam)

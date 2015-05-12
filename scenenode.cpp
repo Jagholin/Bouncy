@@ -24,15 +24,18 @@ SceneNode::~SceneNode()
 		m_scene->unregisterSceneNode(m_name);
 }
 
-void SceneNode::render(GraphicsState& aState, bool recursive /*= true*/)
+void SceneNode::render(GraphicsState& aState, GraphicsStateSet pretendState, CommandQueue& commands, bool recursive)
 {
-	ApplyStateSet _{ aState, *m_nodeState };
-	for (auto aDrawable : m_drawables)
-		aDrawable->render();
+	ApplyStateSet _{ aState, *m_nodeState, pretendState, commands };
+	//CommandQueue res = _.queue();
+	for (auto aDrawable : m_drawables) {
+		aDrawable->addToQueue(aState, commands);
+	}
 	if (recursive)
 	{
-		for (auto aChild : m_children)
-			aChild->render(aState, recursive);
+		for (auto aChild : m_children) {
+			aChild->render(aState, pretendState, commands, recursive);
+		}
 	}
 }
 

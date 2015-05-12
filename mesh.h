@@ -44,6 +44,9 @@ public:
 	static bool isIndexBufferBound(GLuint bufferId);
 	static void setIndexBufferBound(GLuint bufferId);
 	static void unbindIndexBuffer(GLuint bufferId);
+
+	virtual void addToQueue(GraphicsState&, CommandQueue& out) override;
+
 protected:
 
 	std::vector<VertexData> m_vertices;

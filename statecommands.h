@@ -22,6 +22,9 @@ public:
 	void priv_addToQueue(std::shared_ptr<RenderCommand> const& command);
 	void priv_addToWaitlist(std::shared_ptr<RenderCommand> const& command);
 
+	CommandQueue& operator=(const CommandQueue&);
+	CommandQueue& operator=(CommandQueue&&);
+
 	typedef std::deque<std::shared_ptr<RenderCommand>> queue_type;
 	typedef queue_type::const_iterator iterator_type;
 protected:

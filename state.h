@@ -27,7 +27,7 @@ public:
 	}
 
 	void addElement(const std::string &name, const std::shared_ptr<GraphicsStateElement>&);
-	CommandQueue asCommandQueue(GraphicsState&) const;
+	void asCommandQueue(GraphicsState&, CommandQueue&) const;
 
 	GraphicsStateSet operator+(const GraphicsStateSet&) const;
 	GraphicsStateSet operator-(const GraphicsStateSet&) const;
@@ -53,15 +53,18 @@ public:
 	//void setStateData(std::string name, std::shared_ptr<RegistryDataItem> stateData);
 	GraphicsStateRegistry& stateData();
 	const GraphicsStateRegistry& stateData() const;
+	GraphicsStateSet currentState() const;
 	//void commit();
 
-    CommandQueue compileStateCommands();
+    void compileStateCommands(GraphicsStateSet &pretendState, CommandQueue&);
 
 	friend class ApplyStateSet;
 
 protected:
 	std::deque<GraphicsStateSet> m_stateStack;
 	GraphicsStateSet m_currentState;
+
+	//GraphicsStateSet m_pretendState;
 
 	// Current graphics state
 	//std::unordered_map<std::string, std::shared_ptr<RegistryDataItem>> m_stateData;
@@ -71,12 +74,15 @@ protected:
 class ApplyStateSet
 {
 public:
-	ApplyStateSet(GraphicsState&, GraphicsStateSet&);
+	ApplyStateSet(GraphicsState&, GraphicsStateSet&, GraphicsStateSet&, CommandQueue&);
 	ApplyStateSet(const ApplyStateSet&) = delete;
 	ApplyStateSet(ApplyStateSet&&) = delete;
 	~ApplyStateSet();
 
+	//CommandQueue& queue();
+
 protected:
 	GraphicsState& m_state;
 	GraphicsStateSet& m_set;
+	//CommandQueue m_queue;
 };

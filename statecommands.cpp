@@ -57,6 +57,20 @@ void CommandQueue::priv_addToWaitlist(std::shared_ptr<RenderCommand> const& comm
 	m_waitlist.push_back(command);
 }
 
+CommandQueue& CommandQueue::operator=(const CommandQueue& rhs)
+{
+	m_queue = rhs.m_queue;
+	m_waitlist = rhs.m_waitlist;
+	return *this;
+}
+
+CommandQueue & CommandQueue::operator=(CommandQueue && rhs)
+{
+	m_queue = std::move(rhs.m_queue);
+	m_waitlist = std::move(rhs.m_waitlist);
+	return *this;
+}
+
 CommandQueue::AddToQueueOp RenderCommand::canAddToQueue(CommandQueue::queue_type& aQueue, CommandQueue::iterator_type const& newElemBegin, CommandQueue::iterator_type const& newElemEnd)
 {
 	return CommandQueue::ADD_ELEMENT;

@@ -1,7 +1,9 @@
 #include <glm/gtc/epsilon.hpp>
+#include <memory>
 #include "mesh.h"
 #include "buffer.h"
 #include "glerror.h"
+#include "drawcommands.h"
 
 EditableMesh::EditableMesh() : m_vertexBuffer(new GraphicsBuffer), m_indexBuffer(new GraphicsBuffer)
 {
@@ -130,6 +132,11 @@ void EditableMesh::unbindIndexBuffer(GLuint bufferId)
 			indexPair.second = 0;
 		}
 	}
+}
+
+void EditableMesh::addToQueue(GraphicsState& state, CommandQueue& out)
+{
+	std::make_shared<DrawElementsCommand>(this)->addToQueue(state, out);
 }
 
 GLuint EditableMesh::s_boundVA = 0;

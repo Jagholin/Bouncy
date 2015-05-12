@@ -19,14 +19,12 @@ void GraphicsStateSet::addElement(const std::string &name, const std::shared_ptr
 	m_stateElements[name] = element;
 }
 
-CommandQueue GraphicsStateSet::asCommandQueue(GraphicsState& state) const
+void GraphicsStateSet::asCommandQueue(GraphicsState& state, CommandQueue& result) const
 {
-	CommandQueue result{};
 	for (auto stateElement : m_stateElements)
 	{
 		stateElement.second->apply(state, result);
 	}
-	return result;
 }
 
 GraphicsStateSet GraphicsStateSet::operator+(const GraphicsStateSet& rhs) const
@@ -99,6 +97,11 @@ const GraphicsStateRegistry & GraphicsState::stateData() const
 	return m_stateData;
 }
 
+GraphicsStateSet GraphicsState::currentState() const
+{
+	return m_currentState;
+}
+
 /*void GraphicsState::commit()
 {
 	// Compile compound StateSet from stack
@@ -111,28 +114,30 @@ const GraphicsStateRegistry & GraphicsState::stateData() const
 	m_currentState = newSet;
 }*/
 
-CommandQueue GraphicsState::compileStateCommands()
+void GraphicsState::compileStateCommands(GraphicsStateSet& pretendStateStack, CommandQueue& queue)
 {
 	GraphicsStateSet newSet;
 	for (auto aSet : m_stateStack)
 	{
 		newSet += aSet;
 	}
-	GraphicsStateSet diff = newSet - m_currentState;
+	GraphicsStateSet diff = newSet - pretendStateStack;
+	//pretendStateStack.push_back(newSet);
+	pretendStateStack = std::move(newSet);
 
-	return diff.asCommandQueue(*this);
+	diff.asCommandQueue(*this, queue);
+	//return queue;
 }
 
-ApplyStateSet::ApplyStateSet(GraphicsState& theState, GraphicsStateSet& aSet) :
+ApplyStateSet::ApplyStateSet(GraphicsState& theState, GraphicsStateSet& aSet, GraphicsStateSet& pretendSet, CommandQueue& queue) :
 m_state(theState),
 m_set(aSet)
 {
 	theState.m_stateStack.push_back(aSet);
-	theState.commit();
+	theState.compileStateCommands(pretendSet, queue);
 }
 
 ApplyStateSet::~ApplyStateSet()
 {
 	m_state.m_stateStack.pop_back();
-	m_state.commit();
 }

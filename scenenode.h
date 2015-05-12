@@ -29,7 +29,7 @@ public:
 	SceneNode& operator=(const SceneNode&)=delete;
 	SceneNode& operator=(SceneNode&&)=delete;
 
-	virtual CommandQueue render(GraphicsState& aState, bool recursive = true);
+	virtual void render(GraphicsState& aState, GraphicsStateSet pretendState, CommandQueue& commands, bool recursive);
 	void setNodeTransform(const glm::mat4& newTransform);
 
 	void addDrawable(const std::shared_ptr<Drawable>& aDrawable);
@@ -41,7 +41,7 @@ public:
 	SceneNode* parent() const;
 
 	glm::mat4 worldTransform() const;
-	void rebuildStateSet();
+	//void rebuildStateSet();
 
 	std::string name();
 protected:
@@ -54,7 +54,9 @@ protected:
 	SceneNode* m_parent;
 	std::string m_name;
 	GraphicsScene* m_scene;
+	CommandQueue m_commandCache;
 	bool m_stateSetValid = false;
+	bool m_commandQueueDirty = true;
 
 	void orphan();
 	void resetParent(SceneNode* newParent);

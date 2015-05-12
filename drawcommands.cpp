@@ -12,3 +12,8 @@ void DrawElementsCommand::apply(GraphicsState& state)
     m_slave->render();
 }
 
+RenderCommand::CommandType DrawElementsCommand::type() const
+{
+	return RenderCommand::DRAWELEMENTSDRAW;
+}
+
