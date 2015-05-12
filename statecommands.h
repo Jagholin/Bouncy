@@ -6,57 +6,57 @@
 #include "state.h"
 #include "ref_ptr.h"
 
-class RenderCommand;
+class RenderCommandOld;
 class GraphicsState;
-class CommandQueue
+class CommandQueueOld
 {
 public:
 	enum AddToQueueOp{
 		ADD_ELEMENT, DONT_ADD_ELEMENT, REMOVE_ELEMENT
 	};
-	CommandQueue() = default;
-	CommandQueue(const CommandQueue&) = delete;
-	CommandQueue(CommandQueue&&);
+	CommandQueueOld() = default;
+	CommandQueueOld(const CommandQueueOld&) = delete;
+	CommandQueueOld(CommandQueueOld&&);
 
-	std::deque<std::shared_ptr<RenderCommand>>& queue(GraphicsState const&, bool finalize = true);
-	void priv_addToQueue(std::shared_ptr<RenderCommand> const& command);
-	void priv_addToWaitlist(std::shared_ptr<RenderCommand> const& command);
+	std::deque<std::shared_ptr<RenderCommandOld>>& queue(GraphicsState const&, bool finalize = true);
+	void priv_addToQueue(std::shared_ptr<RenderCommandOld> const& command);
+	void priv_addToWaitlist(std::shared_ptr<RenderCommandOld> const& command);
 
-	CommandQueue& operator=(const CommandQueue&);
-	CommandQueue& operator=(CommandQueue&&);
+	CommandQueueOld& operator=(const CommandQueueOld&);
+	CommandQueueOld& operator=(CommandQueueOld&&);
 
-	typedef std::deque<std::shared_ptr<RenderCommand>> queue_type;
+	typedef std::deque<std::shared_ptr<RenderCommandOld>> queue_type;
 	typedef queue_type::const_iterator iterator_type;
 protected:
-	std::deque<std::shared_ptr<RenderCommand>> m_queue, m_waitlist;
+	std::deque<std::shared_ptr<RenderCommandOld>> m_queue, m_waitlist;
 };
 
-class RenderCommand : protected std::enable_shared_from_this<RenderCommand>
+class RenderCommandOld : protected std::enable_shared_from_this<RenderCommandOld>
 {
 public:
 	enum CommandType {
 		PROGRAMCHANGE, UNIFORMCHANGE, DRAWELEMENTSDRAW
 	};
-	virtual ~RenderCommand() = default;
+	virtual ~RenderCommandOld() = default;
 
 	virtual void apply(GraphicsState& theState) = 0;
-	virtual void addToQueue(const GraphicsState& theState, CommandQueue& commandQueue)
+	virtual void addToQueue(const GraphicsState& theState, CommandQueueOld& commandQueue)
 	{
 		commandQueue.priv_addToQueue(shared_from_this());
 	}
-	virtual CommandQueue::AddToQueueOp canAddToQueue(CommandQueue::queue_type& aQueue, CommandQueue::iterator_type const& newElemBegin, CommandQueue::iterator_type const& newElemEnd);
+	virtual CommandQueueOld::AddToQueueOp canAddToQueue(CommandQueueOld::queue_type& aQueue, CommandQueueOld::iterator_type const& newElemBegin, CommandQueueOld::iterator_type const& newElemEnd);
 	virtual void waitingSweep(GraphicsState const&) const;
 	virtual CommandType type() const = 0;
 };
 
 class ShaderProgram;
-class ProgramChangeCommand : public RenderCommand
+class ProgramChangeCommandOld : public RenderCommandOld
 {
 public:
-	ProgramChangeCommand(const ref_ptr<ShaderProgram>& newProgram);
+	ProgramChangeCommandOld(const ref_ptr<ShaderProgram>& newProgram);
 
 	void apply(GraphicsState& theState) override;
-	void addToQueue(const GraphicsState& theState, CommandQueue& commandQueue) override;
+	void addToQueue(const GraphicsState& theState, CommandQueueOld& commandQueue) override;
 
 	CommandType type() const override;
 
@@ -68,17 +68,17 @@ protected:
 };
 
 class Uniform;
-class UniformChangeCommand : public RenderCommand
+class UniformChangeCommandOld : public RenderCommandOld
 {
 public:
-	UniformChangeCommand(const ref_ptr<Uniform>& newUniform);
+	UniformChangeCommandOld(const ref_ptr<Uniform>& newUniform);
 
 	void apply(GraphicsState& theState) override;
-	void addToQueue(const GraphicsState& theState, CommandQueue& commandQueue) override;
+	void addToQueue(const GraphicsState& theState, CommandQueueOld& commandQueue) override;
 
 	CommandType type() const override;
 
-	virtual CommandQueue::AddToQueueOp canAddToQueue(CommandQueue::queue_type& aQueue, CommandQueue::iterator_type const& newElemBegin, CommandQueue::iterator_type const& newElemEnd) override;
+	virtual CommandQueueOld::AddToQueueOp canAddToQueue(CommandQueueOld::queue_type& aQueue, CommandQueueOld::iterator_type const& newElemBegin, CommandQueueOld::iterator_type const& newElemEnd) override;
 	virtual void waitingSweep(GraphicsState const&) const override;
 
 	//typedef TypedStateData<std::shared_ptr<ShaderProgram>> ProgramStateData;

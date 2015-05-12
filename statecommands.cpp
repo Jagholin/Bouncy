@@ -4,14 +4,14 @@
 #include "uniform.h"
 #include <iostream>
 
-CommandQueue::CommandQueue(CommandQueue&& rhs) : 
+CommandQueueOld::CommandQueueOld(CommandQueueOld&& rhs) : 
 m_queue(std::move(rhs.m_queue)), 
 m_waitlist(std::move(rhs.m_waitlist))
 {
 
 }
 
-std::deque<std::shared_ptr<RenderCommand>>& CommandQueue::queue(GraphicsState const& theState, bool finalize)
+std::deque<std::shared_ptr<RenderCommandOld>>& CommandQueueOld::queue(GraphicsState const& theState, bool finalize)
 {
 	if (!m_waitlist.empty() && finalize)
 	{
@@ -25,13 +25,13 @@ std::deque<std::shared_ptr<RenderCommand>>& CommandQueue::queue(GraphicsState co
 	return m_queue;
 }
 
-void CommandQueue::priv_addToQueue(std::shared_ptr<RenderCommand> const& command)
+void CommandQueueOld::priv_addToQueue(std::shared_ptr<RenderCommandOld> const& command)
 {
 	m_queue.push_back(command);
 	auto lastElementPointer = m_queue.cend();
 	--lastElementPointer;
 	bool elementAdded = false;
-	std::deque<std::shared_ptr<RenderCommand>> newWaitList;
+	std::deque<std::shared_ptr<RenderCommandOld>> newWaitList;
 	do {
 		elementAdded = false;
 		for (auto waitingElement : m_waitlist)
@@ -52,42 +52,42 @@ void CommandQueue::priv_addToQueue(std::shared_ptr<RenderCommand> const& command
 	} while (elementAdded);
 }
 
-void CommandQueue::priv_addToWaitlist(std::shared_ptr<RenderCommand> const& command)
+void CommandQueueOld::priv_addToWaitlist(std::shared_ptr<RenderCommandOld> const& command)
 {
 	m_waitlist.push_back(command);
 }
 
-CommandQueue& CommandQueue::operator=(const CommandQueue& rhs)
+CommandQueueOld& CommandQueueOld::operator=(const CommandQueueOld& rhs)
 {
 	m_queue = rhs.m_queue;
 	m_waitlist = rhs.m_waitlist;
 	return *this;
 }
 
-CommandQueue & CommandQueue::operator=(CommandQueue && rhs)
+CommandQueueOld & CommandQueueOld::operator=(CommandQueueOld && rhs)
 {
 	m_queue = std::move(rhs.m_queue);
 	m_waitlist = std::move(rhs.m_waitlist);
 	return *this;
 }
 
-CommandQueue::AddToQueueOp RenderCommand::canAddToQueue(CommandQueue::queue_type& aQueue, CommandQueue::iterator_type const& newElemBegin, CommandQueue::iterator_type const& newElemEnd)
+CommandQueueOld::AddToQueueOp RenderCommandOld::canAddToQueue(CommandQueueOld::queue_type& aQueue, CommandQueueOld::iterator_type const& newElemBegin, CommandQueueOld::iterator_type const& newElemEnd)
 {
-	return CommandQueue::ADD_ELEMENT;
+	return CommandQueueOld::ADD_ELEMENT;
 }
 
-void RenderCommand::waitingSweep(GraphicsState const&) const
+void RenderCommandOld::waitingSweep(GraphicsState const&) const
 {
 
 }
 
-ProgramChangeCommand::ProgramChangeCommand(const ref_ptr<ShaderProgram>& newProgram) :
+ProgramChangeCommandOld::ProgramChangeCommandOld(const ref_ptr<ShaderProgram>& newProgram) :
 m_program(newProgram), m_currentShaderItem(nullptr), m_globalUniformsItem(nullptr)
 {
 	// no-op
 }
 
-void ProgramChangeCommand::apply(GraphicsState& theState)
+void ProgramChangeCommandOld::apply(GraphicsState& theState)
 {
 	//RegistryDataItem* myData = theState.stateData("shaderProgram");
 	if (!m_currentShaderItem)
@@ -119,13 +119,13 @@ void ProgramChangeCommand::apply(GraphicsState& theState)
 	m_currentShaderItem->setValue(m_program);
 }
 
-void ProgramChangeCommand::addToQueue(const GraphicsState& theState, CommandQueue& commandQueue)
+void ProgramChangeCommandOld::addToQueue(const GraphicsState& theState, CommandQueueOld& commandQueue)
 {
 	for (auto & aCommand : commandQueue.queue(theState, false))
 	{
-		if (aCommand->type() == RenderCommand::PROGRAMCHANGE)
+		if (aCommand->type() == RenderCommandOld::PROGRAMCHANGE)
 		{
-			ProgramChangeCommand* realCommand = static_cast<ProgramChangeCommand*>(aCommand.get());
+			ProgramChangeCommandOld* realCommand = static_cast<ProgramChangeCommandOld*>(aCommand.get());
 			realCommand->m_program = m_program;
 			return;
 		}
@@ -155,22 +155,22 @@ void ProgramChangeCommand::addToQueue(const GraphicsState& theState, CommandQueu
 		if (!anUniformIter->second->isValueOf<ref_ptr<Uniform>>())
 			continue;
 		ref_ptr<Uniform> realData = anUniformIter->second->as<ref_ptr<Uniform>>();
-		std::make_shared<UniformChangeCommand>(realData)->addToQueue(theState, commandQueue);
+		std::make_shared<UniformChangeCommandOld>(realData)->addToQueue(theState, commandQueue);
 	}
 }
 
-RenderCommand::CommandType ProgramChangeCommand::type() const
+RenderCommandOld::CommandType ProgramChangeCommandOld::type() const
 {
-	return RenderCommand::PROGRAMCHANGE;
+	return RenderCommandOld::PROGRAMCHANGE;
 }
 
-UniformChangeCommand::UniformChangeCommand(const ref_ptr<Uniform>& newUniform):
+UniformChangeCommandOld::UniformChangeCommandOld(const ref_ptr<Uniform>& newUniform):
 m_uniform(newUniform), m_shaderItem(nullptr)
 {
 
 }
 
-void UniformChangeCommand::apply(GraphicsState& theState)
+void UniformChangeCommandOld::apply(GraphicsState& theState)
 {
 	//RegistryDataItem* programData = theState.stateData("shaderProgram");
 	if (!m_shaderItem)
@@ -205,19 +205,19 @@ void UniformChangeCommand::apply(GraphicsState& theState)
 	}
 }
 
-void UniformChangeCommand::addToQueue(const GraphicsState& theState, CommandQueue& commandQueue)
+void UniformChangeCommandOld::addToQueue(const GraphicsState& theState, CommandQueueOld& commandQueue)
 {
 	// Try to find a program change command
 	bool programFound = false;
 	for (auto aCommand : commandQueue.queue(theState, false))
 	{
-		if (aCommand->type() == RenderCommand::PROGRAMCHANGE)
+		if (aCommand->type() == RenderCommandOld::PROGRAMCHANGE)
 		{
 			programFound = true;
 		}
-		else if (aCommand->type() == RenderCommand::UNIFORMCHANGE)
+		else if (aCommand->type() == RenderCommandOld::UNIFORMCHANGE)
 		{
-			UniformChangeCommand* realCommand = static_cast<UniformChangeCommand*>(aCommand.get());
+			UniformChangeCommandOld* realCommand = static_cast<UniformChangeCommandOld*>(aCommand.get());
 			if (m_uniform->overrides(*realCommand->m_uniform))
 			{
 				realCommand->m_uniform = m_uniform;
@@ -232,38 +232,38 @@ void UniformChangeCommand::addToQueue(const GraphicsState& theState, CommandQueu
 	return;
 }
 
-RenderCommand::CommandType UniformChangeCommand::type() const
+RenderCommandOld::CommandType UniformChangeCommandOld::type() const
 {
-	return RenderCommand::UNIFORMCHANGE;
+	return RenderCommandOld::UNIFORMCHANGE;
 }
 
-CommandQueue::AddToQueueOp UniformChangeCommand::canAddToQueue(CommandQueue::queue_type& aQueue, CommandQueue::iterator_type const& newElemBegin, CommandQueue::iterator_type const& newElemEnd)
+CommandQueueOld::AddToQueueOp UniformChangeCommandOld::canAddToQueue(CommandQueueOld::queue_type& aQueue, CommandQueueOld::iterator_type const& newElemBegin, CommandQueueOld::iterator_type const& newElemEnd)
 {
-	CommandQueue::iterator_type currentElem = newElemBegin;
+	CommandQueueOld::iterator_type currentElem = newElemBegin;
 	bool foundProgram = false;
 	for (; currentElem != newElemEnd; ++currentElem)
 	{
-		if ((*currentElem)->type() == RenderCommand::PROGRAMCHANGE)
+		if ((*currentElem)->type() == RenderCommandOld::PROGRAMCHANGE)
 		{
 			foundProgram = true;
 		}
-		else if ((*currentElem)->type() == RenderCommand::UNIFORMCHANGE)
+		else if ((*currentElem)->type() == RenderCommandOld::UNIFORMCHANGE)
 		{
-			UniformChangeCommand* realCommand = static_cast<UniformChangeCommand*>(currentElem->get());
+			UniformChangeCommandOld* realCommand = static_cast<UniformChangeCommandOld*>(currentElem->get());
 			if (m_uniform->overrides(*realCommand->m_uniform))
 			{
 				realCommand->m_uniform = m_uniform;
-				return CommandQueue::REMOVE_ELEMENT;
+				return CommandQueueOld::REMOVE_ELEMENT;
 			}
 		}
 	}
 	if (foundProgram)
-		return CommandQueue::ADD_ELEMENT;
+		return CommandQueueOld::ADD_ELEMENT;
 	else
-		return CommandQueue::DONT_ADD_ELEMENT;
+		return CommandQueueOld::DONT_ADD_ELEMENT;
 }
 
-void UniformChangeCommand::waitingSweep(GraphicsState const& theState) const
+void UniformChangeCommandOld::waitingSweep(GraphicsState const& theState) const
 {
 	//RegistryDataItem* currProgram = theState.stateData("shaderProgram");
 	//if (!currProgram || !currProgram->isA<ProgramStateData>())

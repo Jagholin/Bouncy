@@ -1,7 +1,16 @@
 #pragma once
 #include "statecommands.h"
+#include "commandqueue.h"
 
 class Drawable;
+
+class DrawCommand : public RenderCommand
+{
+public:
+    bool isDraw() const override {
+        return true;
+    }
+};
 
 class DrawElementsCommand : public RenderCommand
 {
